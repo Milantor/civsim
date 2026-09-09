@@ -55,7 +55,6 @@ namespace civsim
     {
         std::vector<int> tileIndexes;
     };
-
     // LEVEL:
     // whole generated map object in memory, with map size from settings and tile rows stored in the vector.
     struct Level
@@ -82,14 +81,16 @@ namespace civsim
 
         // GenerateRiver() paints the river from a border point list and endpoint mode.
         bool GenerateRiver(int riverWidth,
-                            int bankWidth,
-                            RiverGeneratorMode mode,
-                            std::optional<int> startPointIndex = std::nullopt,
-                            std::optional<int> endPointIndex = std::nullopt);
+                           int bankWidth,
+                           RiverGeneratorMode mode,
+                           std::optional<int> startPointIndex = std::nullopt,
+                           std::optional<int> endPointIndex = std::nullopt);
 
         // GenerateRocks() grows rock clusters on the dirt field using the tune values.
         bool GenerateRocks(float volume, float spacing, float density);
     };
+
+        const RockCluster *findClusterByTile(const Level &level, int tileIndex);
 
     // CURSOR TILE:
     // tiny data box for the tile currently under the pointer.
@@ -150,9 +151,9 @@ namespace civsim
                    const std::array<raylib::Texture2D, 5> &textures,
                    raylib::Vector2 origin);
 
-    // TESTFUNC() samples one stored rock cluster with at least 50 real tiles and
+    // Rock2OreClusterPenetratorTEST() samples one stored rock cluster with at least 50 real tiles and
     // changes a random 40% of that cluster into the new Ore tile type.
-    bool TESTFUNC(Level &level);
+    bool Rock2OreClusterPenetratorTEST(Level &level, const RockCluster &cluster);
 
     // levelgen: map factory and level recipe.
     namespace levelgen

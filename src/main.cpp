@@ -11,7 +11,7 @@ using civsim::GetTileUnderCursor;
 using civsim::Level;
 using civsim::SaveLevelAsBinary;
 using civsim::SaveLevelAsPng;
-using civsim::TESTFUNC;
+using civsim::Rock2OreClusterPenetratorTEST;
 using civsim::TileInfos;
 using civsim::TileType;
 
@@ -30,7 +30,7 @@ int main()
     // set up cam
     raylib::Camera2D gameCamera(raylib::Vector2{GetScreenWidth() / 2.f, GetScreenHeight() / 2.f}, raylib::Vector2{0.f, 0.f});
     gameCamera.zoom = settings::CameraStartZoom;
-    window.ToggleBorderless().SetTargetFPS(settings::TargetFps);
+    window.ToggleBorderless().SetTargetFPS(settings::TargetFps).ToggleFullscreen();
     EnableCursor();
 
     std::array<raylib::Texture2D, 5> textures;
@@ -44,13 +44,18 @@ int main()
     // main loop
     while (!window.ShouldClose())
     {
+        const raylib::Vector2 origin{-level.width * settings::TileSize / 2.f,
+                                     -level.height * settings::TileSize / 2.f};
+        const auto cursorTile = GetTileUnderCursor(level, gameCamera, origin, settings::TileSize);
+
         if (IsKeyPressed(KEY_SPACE))
         {
             level = levelgen::GenerateDefaultLevel();
         }
-        if (IsKeyPressed(KEY_O))
+        if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT) && cursorTile.has_value() && cursorTile->type == TileType::Rock)
         {
-            TESTFUNC(level);
+            auto cluster = civsim::findClusterByTile(level, cursorTile->x + cursorTile->y * level.width);
+            Rock2OreClusterPenetratorTEST(level, *cluster);
         }
 
         camera::UpdateCameraMovement(gameCamera,
@@ -95,35 +100,24 @@ int main()
 
 // --------- DRAW FRAME ---------
 
-void UpdateDrawFrame(raylib::Camera2D &camera,
+void UpdateDrawFrame(raylib::Camera2D &gameCamera,
                      const Level &level,
                      const std::array<raylib::Texture2D, 5> &textures)
 {
     BeginDrawing();
     ClearBackground(BLACK);
-    camera.BeginMode();
+    gameCamera.BeginMode();
 
-    const raylib::Vector2 origin{
-        -level.width * settings::TileSize / 2.f,
-        -level.height * settings::TileSize / 2.f};
-    DrawLevel(
-        level,
-        textures,
-        origin);
+    const raylib::Vector2 origin{-level.width * settings::TileSize / 2.f,
+                                 -level.height * settings::TileSize / 2.f};
+    DrawLevel(level, textures, origin);
 
-    camera.EndMode();
-    DrawText(settings::HelpText,
-             settings::HelpTextX,
-             settings::HelpTextY,
-             settings::HelpTextSize,
-             RAYWHITE);
+    gameCamera.EndMode();
+    // TODO: ANNIHILATE! maby new super cool gui system (of course that)
+    DrawText(settings::HelpText, settings::HelpTextX, settings::HelpTextY, settings::HelpTextSize, RAYWHITE);
     DrawFPS(settings::FpsTextX, settings::FpsTextY);
 
-    const auto cursorTile = GetTileUnderCursor(
-        level,
-        camera,
-        origin,
-        settings::TileSize);
+    const auto cursorTile = GetTileUnderCursor(level, gameCamera, origin, settings::TileSize);
     if (cursorTile.has_value())
     {
         const char *tileText = TextFormat(
@@ -146,19 +140,4 @@ void UpdateDrawFrame(raylib::Camera2D &camera,
                  RAYWHITE);
     }
     EndDrawing();
-}
-
-// --------- ECS SAMPLE TILE ---------
-
-void CreateRandomTileEntity(entt::registry &registry,
-                            const raylib::Texture2D &tileTexture)
-{
-    const auto entity = registry.create();
-    const int margin = tileTexture.width / 2;
-    const int halfScreenWidth = GetScreenWidth() / 2;
-    const int halfScreenHeight = GetScreenHeight() / 2;
-    registry.emplace<Position>(entity, raylib::Vector2{
-                                           static_cast<float>(GetRandomValue(-halfScreenWidth + margin, halfScreenWidth - margin)),
-                                           static_cast<float>(GetRandomValue(-halfScreenHeight + margin, halfScreenHeight - margin))});
-    registry.emplace<SpriteData>(entity, &tileTexture);
 }

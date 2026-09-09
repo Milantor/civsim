@@ -57,6 +57,21 @@ namespace civsim
         return tiles[static_cast<std::size_t>(y * width + x)];
     }
 
+    const RockCluster *findClusterByTile(const Level &level, int tileIndex)
+    {
+        for (const auto &cluster : level.rockClusters)
+        {
+            for (int idx : cluster.tileIndexes)
+            {
+                if (idx == tileIndex)
+                {
+                    return &cluster;
+                }
+            }
+        }
+        return nullptr; // не найден
+    }
+
     // --------- SAVE / EXPORT ---------
 
     bool SaveLevelAsBinary(const Level &level,
@@ -745,27 +760,27 @@ namespace civsim
         return TileInfos[index].name;
     }
 
-    bool TESTFUNC(Level &level)
+    bool Rock2OreClusterPenetratorTEST(Level &level, const RockCluster &cluster)
     {
-        if (level.rockClusters.empty())
-            return false;
+        // if (level.rockClusters.empty())
+        //     return false;
 
-        std::vector<std::size_t> eligible;
-        eligible.reserve(level.rockClusters.size());
-        for (std::size_t i = 0; i < level.rockClusters.size(); ++i)
-        {
-            if (level.rockClusters[i].tileIndexes.size() >= 50)
-                eligible.push_back(i);
-        }
+        // std::vector<std::size_t> eligible;
+        // eligible.reserve(level.rockClusters.size());
+        // for (std::size_t i = 0; i < level.rockClusters.size(); ++i)
+        // {
+        //     if (level.rockClusters[i].tileIndexes.size() >= 50)
+        //         eligible.push_back(i);
+        // }
 
-        if (eligible.empty())
-            return false;
+        // if (eligible.empty())
+        //     return false;
 
         std::mt19937 randomEngine(std::random_device{}());
-        std::uniform_int_distribution<std::size_t> clusterPick(0,
-                                                               eligible.size() - 1);
-        const std::size_t clusterIndex = eligible[clusterPick(randomEngine)];
-        RockCluster &cluster = level.rockClusters[clusterIndex];
+        // std::uniform_int_distribution<std::size_t> clusterPick(0,
+        //                                                        eligible.size() - 1);
+        // const std::size_t clusterIndex = eligible[clusterPick(randomEngine)];
+        // RockCluster &cluster = level.rockClusters[clusterIndex];
 
         std::vector<int> sampled = cluster.tileIndexes;
         std::shuffle(sampled.begin(), sampled.end(), randomEngine);
