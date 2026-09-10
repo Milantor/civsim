@@ -35,19 +35,33 @@ namespace civsim
         Ore
     };
 
+    struct SpriteInfo
+    {
+        float u0, v0, u1, v1;   // UV-координаты в атласе
+        const char *spriteFile; // путь к файлу (для построения атласа)
+    };
+
     struct TileInfo
     {
         const char *name;
         const char *spriteFile;
+        SpriteInfo sprite;
     };
 
-    inline constexpr std::array<TileInfo, 5> TileInfos{{
-        {"dirt", settings::DirtFile},
-        {"water", settings::WaterFile},
-        {"sand", settings::SandFile},
-        {"rock", settings::RockFile},
-        {"ore", settings::OreFile},
-    }};
+    // inline constexpr std::array<TileInfo, 5> TileInfos{{
+    //     {"dirt", settings::DirtFile},
+    //     {"water", settings::WaterFile},
+    //     {"sand", settings::SandFile},
+    //     {"rock", settings::RockFile},
+    //     {"ore", settings::OreFile},
+    // }};
+
+    inline std::vector<TileInfo> TileInfos = {
+        {"dirt", settings::DirtFile, {0, 0, 0, 0, settings::DirtFile}},
+        {"water", settings::WaterFile, {0, 0, 0, 0, settings::WaterFile}},
+        {"sand", settings::SandFile, {0, 0, 0, 0, settings::SandFile}},
+        {"rock", settings::RockFile, {0, 0, 0, 0, settings::RockFile}},
+        {"ore", settings::OreFile, {0, 0, 0, 0, settings::OreFile}}};
 
     // ROCK CLUSTER:
     // real connected rock component stored as the flat row-major tile indexes it owns.
@@ -90,7 +104,7 @@ namespace civsim
         bool GenerateRocks(float volume, float spacing, float density);
     };
 
-        const RockCluster *findClusterByTile(const Level &level, int tileIndex);
+    const RockCluster *findClusterByTile(const Level &level, int tileIndex);
 
     // CURSOR TILE:
     // tiny data box for the tile currently under the pointer.

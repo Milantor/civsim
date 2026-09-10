@@ -10,7 +10,7 @@ namespace civsim
         // map size
         inline constexpr int MapWidth = 250;
         inline constexpr int MapHeight = 250;
-        inline constexpr int TileSize = 32;
+        inline constexpr int TileSize = 64;
 
         // river size
         inline constexpr int RiverWidth = 16;

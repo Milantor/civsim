@@ -9,10 +9,9 @@ using civsim::DrawLevel;
 using civsim::GetTileName;
 using civsim::GetTileUnderCursor;
 using civsim::Level;
+using civsim::Rock2OreClusterPenetratorTEST;
 using civsim::SaveLevelAsBinary;
 using civsim::SaveLevelAsPng;
-using civsim::Rock2OreClusterPenetratorTEST;
-using civsim::TileInfos;
 using civsim::TileType;
 
 // local aliases for the small namespace tree
@@ -21,6 +20,15 @@ namespace levelgen = civsim::levelgen;
 namespace camera = civsim::camera;
 
 // --------- APP BOOT ---------
+
+// Функция построения атласа
+Texture2D BuildAtlas(std::vector<civsim::TileInfo> &infos);
+
+// Функция для создания VBO карты (пока только объявление)
+unsigned int BuildTileVBO(const Level &level, const std::vector<civsim::TileInfo> &infos);
+
+// Функция для отрисовки VBO
+void DrawTileVBO(unsigned int vboId, int vertexCount, const Texture2D &atlasTexture);
 
 int main()
 {
@@ -34,10 +42,12 @@ int main()
     EnableCursor();
 
     std::array<raylib::Texture2D, 5> textures;
-    for (std::size_t i = 0; i < TileInfos.size(); ++i)
+    for (std::size_t i = 0; i < civsim::TileInfos.size(); ++i)
     {
-        textures[i] = raylib::Texture2D(std::string(CIVSIM_RESOURCE_DIR) + TileInfos[i].spriteFile);
+        textures[i] = raylib::Texture2D(std::string(CIVSIM_RESOURCE_DIR) + civsim::TileInfos[i].spriteFile);
     }
+
+    auto atlasTexture = BuildAtlas(civsim::TileInfos);
 
     Level level = levelgen::GenerateDefaultLevel();
 
@@ -91,11 +101,62 @@ int main()
                        pngImage))
     {
         ExportImage(pngImage, pngFile.c_str());
+        // test
+        Image atlasImage = LoadImageFromTexture(atlasTexture);
+        ExportImage(atlasImage, (outDir / "atlas.png").c_str());
+        UnloadImage(atlasImage);
         UnloadImage(pngImage);
     }
 
     // shut down
     return 0;
+}
+
+Texture2D BuildAtlas(std::vector<civsim::TileInfo> &infos)
+{
+    const int tileSize = settings::TileSize;
+    const size_t count = infos.size();
+    // Вычисляем оптимальное количество столбцов (например, 4 или sqrt)
+    // int cols = 4; // можно сделать динамически: int cols = (int)std::ceil(std::sqrt(count));
+    int cols = (int)std::ceil(std::sqrt(count));
+    int rows = (count + cols - 1) / cols;
+    int atlasWidth = cols * tileSize;
+    int atlasHeight = rows * tileSize;
+    Image atlasImage = GenImageColor(atlasWidth, atlasHeight, BLANK);
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        Image sprite = LoadImage((std::string(CIVSIM_RESOURCE_DIR) + infos[i].sprite.spriteFile).c_str());
+        int x = (i % cols) * tileSize;
+        int y = (i / cols) * tileSize;
+        Rectangle srcRect = {0, 0, (float)tileSize, (float)tileSize};
+        Rectangle dstRect = {(float)x, (float)y, (float)tileSize, (float)tileSize};
+        ImageDraw(&atlasImage, sprite, srcRect, dstRect, WHITE);
+        // Запись UV
+        infos[i].sprite.u0 = (float)x / atlasWidth;
+        infos[i].sprite.v0 = (float)y / atlasHeight;
+        infos[i].sprite.u1 = (float)(x + tileSize) / atlasWidth;
+        infos[i].sprite.v1 = (float)(y + tileSize) / atlasHeight;
+        UnloadImage(sprite);
+    }
+
+    Texture2D atlasTexture = LoadTextureFromImage(atlasImage);
+    UnloadImage(atlasImage);
+    return atlasTexture;
+}
+
+// Функция построения VBO (пока заглушка)
+unsigned int BuildTileVBO(const Level &level, const std::vector<civsim::TileInfo> &infos)
+{
+    // Здесь будет создание VBO с вершинами
+    // ...
+    return 0;
+}
+
+void DrawTileVBO(unsigned int vboId, int vertexCount, const Texture2D &atlasTexture)
+{
+    // Отрисовка VBO
+    // ...
 }
 
 // --------- DRAW FRAME ---------
