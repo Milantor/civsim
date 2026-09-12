@@ -21,13 +21,14 @@ set(ENTT_INSTALL ON CACHE BOOL "Install EnTT and related files." FORCE)
 
 
 add_executable(${PROJECT_NAME})
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     CIVSIM_RESOURCE_DIR="${CMAKE_SOURCE_DIR}/resources"
 )
 
 
-set(FETCHCONTENT_QUIET OFF)                # показывает, что скачивается/собирается
-set(CMAKE_FETCHCONTENT_TIMEOUT 600)        # 10 минут на ожидание
+set(FETCHCONTENT_QUIET OFF)                # show what is being downloaded/built
+set(CMAKE_FETCHCONTENT_TIMEOUT 600)        # 10 minute timeout
 set(FETCHCONTENT_BASE_DIR ${CMAKE_BINARY_DIR}/_deps)
 #load libs
 include(FetchContent)
