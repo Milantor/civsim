@@ -3,12 +3,23 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <numbers>
 #include <queue>
 #include <random>
 #include <vector>
 
 namespace civsim::level::gen::rocks
 {
+    namespace
+    {
+        // integer grid coordinate used while growing rock clusters.
+        struct TileCoord
+        {
+            int x;
+            int y;
+        };
+    }
+
     bool GenerateRocks(Level &level,
                        float volume,
                        float spacing,
@@ -16,16 +27,16 @@ namespace civsim::level::gen::rocks
     {
         const std::uint64_t rockSeed = seed::MixSeed(level.seed, 0x524f434bULL);
         std::mt19937_64 randomEngine(rockSeed);
-        std::vector<raylib::Vector2> rockCenters;
-        std::vector<raylib::Vector2> rockFrontier;
-        std::vector<raylib::Vector2> dirtTiles;
+        std::vector<TileCoord> rockCenters;
+        std::vector<TileCoord> rockFrontier;
+        std::vector<TileCoord> dirtTiles;
 
         for (int y = 0; y < level.height; ++y)
         {
             for (int x = 0; x < level.width; ++x)
             {
                 if (level.At(x, y) == tile::TileType::Dirt)
-                    dirtTiles.push_back(raylib::Vector2{static_cast<float>(x), static_cast<float>(y)});
+                    dirtTiles.push_back({x, y});
             }
         }
 
@@ -57,7 +68,7 @@ namespace civsim::level::gen::rocks
 
         // the radius estimate is a rough tile budget guess.
         const float averageRadius = std::sqrt(
-            static_cast<float>(targetRockTiles) / (rockCount * PI));
+            static_cast<float>(targetRockTiles) / (rockCount * std::numbers::pi_v<float>));
         const float centerGap = averageRadius * safeSpacing;
 
         std::uniform_int_distribution<int> tilePick(0,
@@ -68,17 +79,17 @@ namespace civsim::level::gen::rocks
              rock < rockCount && placedRockTiles < targetRockTiles;
              ++rock)
         {
-            raylib::Vector2 center = dirtTiles.front();
+            TileCoord center = dirtTiles.front();
             bool foundCenter = false;
 
             for (int attempt = 0;
                  attempt < settings::RockPlaceTries;
                  ++attempt)
             {
-                const raylib::Vector2 candidate = dirtTiles[tilePick(randomEngine)];
+                const TileCoord candidate = dirtTiles[tilePick(randomEngine)];
                 bool farEnough = true;
 
-                for (const raylib::Vector2 &oldCenter : rockCenters)
+                for (const TileCoord &oldCenter : rockCenters)
                 {
                     const float distance = std::hypot(candidate.x - oldCenter.x,
                                                       candidate.y - oldCenter.y);
@@ -115,10 +126,10 @@ namespace civsim::level::gen::rocks
                 std::uniform_int_distribution<int> frontierPick(0,
                                                                 static_cast<int>(rockFrontier.size()) - 1);
                 const int frontierIndex = frontierPick(randomEngine);
-                const raylib::Vector2 tile = rockFrontier[frontierIndex];
+                const TileCoord tile = rockFrontier[frontierIndex];
                 rockFrontier.erase(rockFrontier.begin() + frontierIndex);
-                const int tileX = static_cast<int>(tile.x);
-                const int tileY = static_cast<int>(tile.y);
+                const int tileX = tile.x;
+                const int tileY = tile.y;
 
                 if (level.At(tileX, tileY) != tile::TileType::Dirt)
                     continue;
@@ -128,16 +139,16 @@ namespace civsim::level::gen::rocks
                 ++grownRockTiles;
                 ++placedRockTiles;
 
-                const std::array<raylib::Vector2, 4> neighbors{
-                    raylib::Vector2{tile.x - 1.f, tile.y},
-                    raylib::Vector2{tile.x + 1.f, tile.y},
-                    raylib::Vector2{tile.x, tile.y - 1.f},
-                    raylib::Vector2{tile.x, tile.y + 1.f}};
+                const std::array<TileCoord, 4> neighbors{
+                    TileCoord{tile.x - 1, tile.y},
+                    TileCoord{tile.x + 1, tile.y},
+                    TileCoord{tile.x, tile.y - 1},
+                    TileCoord{tile.x, tile.y + 1}};
 
-                for (const raylib::Vector2 &neighbor : neighbors)
+                for (const TileCoord &neighbor : neighbors)
                 {
-                    const int neighborX = static_cast<int>(neighbor.x);
-                    const int neighborY = static_cast<int>(neighbor.y);
+                    const int neighborX = neighbor.x;
+                    const int neighborY = neighbor.y;
 
                     if (neighborX >= 0 && neighborX < level.width && neighborY >= 0 && neighborY < level.height && level.At(neighborX, neighborY) == tile::TileType::Dirt)
                         rockFrontier.push_back(neighbor);

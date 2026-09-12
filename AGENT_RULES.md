@@ -113,12 +113,9 @@ Namespaces:
 
 ## Known TODOs / backlog
 
-- Texture **ATLAS + VBO** rendering to replace per-tile `io::DrawLevel` blitting.
-  `main.cpp` has a half-working `BuildAtlas` and stubbed `BuildTileVBO` / `DrawTileVBO`.
-- `tile::TileInfo` carries a nested `sprite{u0,v0,u1,v1,spriteFile}` **plus** a
-  deprecated duplicate `spriteFile` on `TileInfo` itself — needs reworking. Open
-  question: should `TileInfo` carry a `TileType` id field?
+- Texture **VBO** rendering to replace per-tile `io::DrawLevel` blitting. `BuildAtlas`
+  now bakes UVs that `io::DrawLevel` samples per tile; `BuildTileVBO` / `DrawTileVBO`
+  in `main.cpp` are still stubs.
+- Open question: should `TileInfo` carry a `TileType` id field?
 - `tile::TileInfos` is hardcoded — should be loaded from json.
-- `io/save.hpp`: both `SaveLevelAsPng` overloads are flagged for rework; the
-  `Texture2D atlas` overload has no definition (unused; latent link error if called).
 - `main.cpp`: the `ANNIHILATE!` comment is a placeholder for a future GUI/text system.

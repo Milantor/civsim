@@ -1,15 +1,12 @@
 #pragma once
 
-#include "raylib-cpp.hpp"
 #include "level/cluster.hpp"
 #include "level/seed.hpp"
 #include "level/tile.hpp"
 #include "settings.hpp"
 
-#include <array>
 #include <cstdint>
 #include <optional>
-#include <string>
 #include <vector>
 
 namespace civsim::level
