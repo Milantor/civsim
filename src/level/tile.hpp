@@ -41,7 +41,6 @@ namespace civsim::tile
     struct TileInfo
     {
         const char *name;
-        const char *spriteFile; // TODO: rework, that thing deprecated
         SpriteInfo sprite;
     };
 
@@ -59,11 +58,11 @@ namespace civsim::tile
      * TODO: load this from json parsing or something like that instead of hardcoding.
      */
     inline std::vector<TileInfo> TileInfos = {
-        {"dirt", settings::DirtFile, {0, 0, 0, 0, settings::DirtFile}},
-        {"water", settings::WaterFile, {0, 0, 0, 0, settings::WaterFile}},
-        {"sand", settings::SandFile, {0, 0, 0, 0, settings::SandFile}},
-        {"rock", settings::RockFile, {0, 0, 0, 0, settings::RockFile}},
-        {"ore", settings::OreFile, {0, 0, 0, 0, settings::OreFile}}};
+        {"dirt", {0, 0, 0, 0, settings::DirtFile}},
+        {"water", {0, 0, 0, 0, settings::WaterFile}},
+        {"sand", {0, 0, 0, 0, settings::SandFile}},
+        {"rock", {0, 0, 0, 0, settings::RockFile}},
+        {"ore", {0, 0, 0, 0, settings::OreFile}}};
 
     /**
      * Turn a TileType enum into the UI-friendly tile word.

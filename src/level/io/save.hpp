@@ -5,7 +5,6 @@
 #include "raylib-cpp.hpp"
 #include "settings.hpp"
 
-#include <array>
 #include <cstdint>
 #include <vector>
 
@@ -22,20 +21,6 @@ namespace civsim::level::io
     bool SaveLevelAsBinary(const Level &level,
                            std::vector<std::uint8_t> &bytes);
 
-    // TODO: REWORK
-    /**
-     * Build a texture-backed PNG image from the Level object.
-     *
-     * @param level current map object
-     * @param textures tile texture registry, indexed by TileType order
-     * @param pngImage output image buffer for the PNG file
-     * @return true when the Image buffer is filled
-     */
-    bool SaveLevelAsPng(const Level &level,
-                        const std::array<raylib::Texture2D, 5> &textures,
-                        Image &pngImage);
-
-    // TODO: REWORK
     /**
      * Build a PNG image from the Level object using a single texture atlas.
      *

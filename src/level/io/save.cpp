@@ -1,6 +1,5 @@
 #include "level/io/save.hpp"
 
-#include <array>
 #include <cstdint>
 #include <vector>
 
@@ -23,13 +22,11 @@ namespace civsim::level::io
     }
 
     bool SaveLevelAsPng(const Level &level,
-                        const std::array<raylib::Texture2D, 5> &textures,
+                        const raylib::Texture2D &atlas,
                         Image &pngImage)
     {
-        // pull every tile texture into a CPU image once, so the blit loop is cheap.
-        std::array<Image, 5> images{};
-        for (std::size_t i = 0; i < images.size(); ++i)
-            images[i] = LoadImageFromTexture(textures[i]);
+        // pull the atlas texture into a CPU image once, so the blit loop is cheap.
+        Image atlasImage = LoadImageFromTexture(atlas);
 
         // start from a blank canvas sized to the whole map in pixels.
         pngImage = GenImageColor(level.width * settings::TileSize,
@@ -42,31 +39,31 @@ namespace civsim::level::io
             {
                 const tile::TileType tile = level.At(x, y);
                 const std::size_t index = static_cast<std::size_t>(tile);
-                // skip tiles with no matching texture slot.
-                if (index >= textures.size())
+                // skip tiles with no matching tile info slot.
+                if (index >= tile::TileInfos.size())
                     continue;
 
-                // source is the whole tile image, dest is its square on the map.
-                Image src = images[index];
-                const Rectangle srcRec{0.f, 0.f,
-                                       static_cast<float>(src.width),
-                                       static_cast<float>(src.height)};
+                // source is the whole tile sprite inside the atlas, dest is its square on the map.
+                const tile::SpriteInfo &sprite = tile::TileInfos[index].sprite;
+                const Rectangle srcRec{sprite.u0 * atlasImage.width,
+                                       sprite.v0 * atlasImage.height,
+                                       (sprite.u1 - sprite.u0) * atlasImage.width,
+                                       (sprite.v1 - sprite.v0) * atlasImage.height};
                 const Rectangle dstRec{static_cast<float>(x * settings::TileSize),
                                        static_cast<float>(y * settings::TileSize),
                                        static_cast<float>(settings::TileSize),
                                        static_cast<float>(settings::TileSize)};
 
                 ImageDraw(&pngImage,
-                          src,
+                          atlasImage,
                           srcRec,
                           dstRec,
                           WHITE);
             }
         }
 
-        // free the temporary CPU images.
-        for (Image &image : images)
-            UnloadImage(image);
+        // free the temporary CPU image.
+        UnloadImage(atlasImage);
 
         return true;
     }

@@ -10,12 +10,12 @@
 #include "settings.hpp"
 
 /**
- * Draw the current tile map by blitting the configured tile textures.
+ * Draw the current tile map by blitting tiles from the atlas.
  *
  * @param camera active camera object
  * @param level map object to draw
- * @param textures tile texture registry, indexed by TileType order
+ * @param atlas tile texture atlas holding every tile sprite
  */
 void UpdateDrawFrame(raylib::Camera2D &camera,
                      const civsim::level::Level &level,
-                     const std::array<raylib::Texture2D, 5> &textures);
+                     const raylib::Texture2D &atlas);

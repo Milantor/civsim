@@ -20,7 +20,7 @@ namespace tile = civsim::tile;
 // --------- APP BOOT ---------
 
 // builds the tile texture atlas
-Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos);
+raylib::Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos);
 
 // creates the map VBO (declaration only for now)
 unsigned int BuildTileVBO(const Level &level, const std::vector<tile::TileInfo> &infos);
@@ -38,12 +38,6 @@ int main()
     gameCamera.zoom = settings::CameraStartZoom;
     window.ToggleBorderless().SetTargetFPS(settings::TargetFps).ToggleFullscreen();
     EnableCursor();
-
-    std::array<raylib::Texture2D, 5> textures;
-    for (std::size_t i = 0; i < tile::TileInfos.size(); ++i)
-    {
-        textures[i] = raylib::Texture2D(std::string(CIVSIM_RESOURCE_DIR) + tile::TileInfos[i].spriteFile);
-    }
 
     auto atlasTexture = BuildAtlas(tile::TileInfos);
 
@@ -73,7 +67,7 @@ int main()
         UpdateDrawFrame(
             gameCamera,
             level,
-            textures);
+            atlasTexture);
     }
 
     // save last map on close
@@ -95,7 +89,7 @@ int main()
 
     Image pngImage = {0};
     if (io::SaveLevelAsPng(level,
-                           textures,
+                           atlasTexture,
                            pngImage))
     {
         ExportImage(pngImage, pngFile.c_str());
@@ -110,7 +104,7 @@ int main()
     return 0;
 }
 
-Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos)
+raylib::Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos)
 {
     const int tileSize = settings::TileSize;
     const size_t count = infos.size();
@@ -137,7 +131,7 @@ Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos)
         UnloadImage(sprite);
     }
 
-    Texture2D atlasTexture = LoadTextureFromImage(atlasImage);
+    raylib::Texture2D atlasTexture = LoadTextureFromImage(atlasImage);
     UnloadImage(atlasImage);
     return atlasTexture;
 }
@@ -160,7 +154,7 @@ void DrawTileVBO(unsigned int vboId, int vertexCount, const Texture2D &atlasText
 
 void UpdateDrawFrame(raylib::Camera2D &gameCamera,
                      const Level &level,
-                     const std::array<raylib::Texture2D, 5> &textures)
+                     const raylib::Texture2D &atlasTexture)
 {
     BeginDrawing();
     ClearBackground(BLACK);
@@ -168,7 +162,7 @@ void UpdateDrawFrame(raylib::Camera2D &gameCamera,
 
     const raylib::Vector2 origin{-level.width * settings::TileSize / 2.f,
                                  -level.height * settings::TileSize / 2.f};
-    io::DrawLevel(level, textures, origin);
+    io::DrawLevel(level, atlasTexture, origin);
 
     gameCamera.EndMode();
     // TODO: ANNIHILATE! maby new super cool gui system (of course that)

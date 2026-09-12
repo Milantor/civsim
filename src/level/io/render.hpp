@@ -1,22 +1,21 @@
 #pragma once
 
 #include "level/level.hpp"
+#include "level/tile.hpp"
 #include "raylib-cpp.hpp"
 #include "settings.hpp"
-
-#include <array>
 
 // io: level serialization and rendering.
 namespace civsim::level::io
 {
     /**
-     * Draw the map by walking the Level array and blitting textures per tile.
+     * Draw the map by walking the Level array and blitting tiles from the atlas.
      *
      * @param level current map object
-     * @param textures tile texture registry, indexed by TileType order
+     * @param atlas tile texture atlas holding every tile sprite
      * @param origin map origin used for sprite placement
      */
     void DrawLevel(const Level &level,
-                   const std::array<raylib::Texture2D, 5> &textures,
+                   const raylib::Texture2D &atlas,
                    raylib::Vector2 origin);
 }
