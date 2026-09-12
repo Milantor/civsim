@@ -1,5 +1,6 @@
 #include "level/io/save.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

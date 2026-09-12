@@ -3,9 +3,11 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <cstdint>
 #include <numbers>
 #include <queue>
 #include <random>
+#include <utility>
 #include <vector>
 
 namespace civsim::level::gen::rocks

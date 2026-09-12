@@ -1,6 +1,7 @@
 #include "level/cursor.hpp"
 
 #include <cmath>
+#include <optional>
 
 namespace civsim::level::cursor
 {

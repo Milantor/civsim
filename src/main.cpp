@@ -1,9 +1,13 @@
 #include "main.hpp"
 
-#include <cstdio>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <filesystem>
 #include <fstream>
+#include <ios>
 #include <string>
+#include <vector>
 
 using civsim::level::Level;
 
@@ -105,7 +109,7 @@ int main()
 raylib::Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos)
 {
     const int tileSize = settings::TileSize;
-    const size_t count = infos.size();
+    const std::size_t count = infos.size();
     // pick a sensible column count (sqrt of the tile count)
     int cols = (int)std::ceil(std::sqrt(count));
     int rows = (count + cols - 1) / cols;
@@ -113,7 +117,7 @@ raylib::Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos)
     int atlasHeight = rows * tileSize;
     Image atlasImage = GenImageColor(atlasWidth, atlasHeight, BLANK);
 
-    for (size_t i = 0; i < count; ++i)
+    for (std::size_t i = 0; i < count; ++i)
     {
         Image sprite = LoadImage((std::string(CIVSIM_RESOURCE_DIR) + infos[i].sprite.spriteFile).c_str());
         int x = (i % cols) * tileSize;

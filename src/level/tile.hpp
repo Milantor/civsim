@@ -2,6 +2,7 @@
 
 #include "settings.hpp"
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 

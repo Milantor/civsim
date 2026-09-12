@@ -1,5 +1,6 @@
 #include "level/seed.hpp"
 
+#include <cstdint>
 #include <random>
 
 namespace civsim::seed

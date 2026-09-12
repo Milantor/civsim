@@ -1,5 +1,8 @@
 #include "level/gen/factory.hpp"
 
+#include <cstdint>
+#include <optional>
+
 namespace civsim::level::gen
 {
     Level GenerateLevel(std::optional<std::uint64_t> seed)

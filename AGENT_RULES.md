@@ -51,6 +51,17 @@ here — this is the standing contract.
   (plus `<...>` std headers).
   - **Only exception:** `src/level/cluster.cpp` keeps `#include "level/level.hpp"`,
     because `cluster.hpp` only forward-declares `Level`.
+- **IWYU (include what you use).** Audit a TU with
+  `clang-tidy -p build --checks='-*,misc-include-cleaner' <file>`.
+  - **Std headers:** every file (header or `.cpp`) explicitly lists the `<...>` it uses
+    directly — no leaning on transitive std includes.
+  - **Project headers:** the header-owns-deps rule above means headers *intentionally*
+    include project headers their interface doesn't use. clang-tidy reports these as
+    `included header X is not used directly`, and also nags at the `raylib-cpp.hpp`
+    umbrella — **both are expected; do NOT "fix" them.**
+  - clang-tidy on a `.cpp` only reports that TU. To audit a header's *own* includes,
+    point it at the header directly:
+    `clang-tidy --checks='-*,misc-include-cleaner' <header> -- -std=c++26 -x c++ -Isrc -Ibuild/_deps/raylib_cpp-src/include -Ibuild/_deps/raylib-src/src -Ibuild/_deps/entt-src/src`
 - **raylib vs raylib-cpp:**
   - Use **`raylib::` types** for anything we **store, pass, or own** (`raylib::Window`,
     `raylib::Camera2D`, `raylib::Vector2`, `raylib::Texture2D`, `raylib::Image`, ...).
@@ -118,4 +129,7 @@ Namespaces:
   in `main.cpp` are still stubs.
 - Open question: should `TileInfo` carry a `TileType` id field?
 - `tile::TileInfos` is hardcoded — should be loaded from json.
+- `main.hpp`'s `#include "entt/entt.hpp"` is currently unused (the ECS demo is still
+  commented out) but is **intentional** — kept for the upcoming ECS work, so don't drop
+  it as "dead".
 - `main.cpp`: the `ANNIHILATE!` comment is a placeholder for a future GUI/text system.

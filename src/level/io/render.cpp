@@ -1,5 +1,7 @@
 #include "level/io/render.hpp"
 
+#include <cstddef>
+
 namespace civsim::level::io
 {
     void DrawLevel(const Level &level,

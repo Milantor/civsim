@@ -3,6 +3,7 @@
 
 #include <queue>
 #include <utility>
+#include <vector>
 
 namespace civsim::level::cluster
 {

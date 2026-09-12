@@ -1,5 +1,8 @@
 #include "level/level.hpp"
 
+#include <cstddef>
+#include <cstdint>
+#include <optional>
 #include <vector>
 
 namespace civsim::level
