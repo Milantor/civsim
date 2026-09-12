@@ -23,10 +23,10 @@ namespace civsim::level::io
 
     bool SaveLevelAsPng(const Level &level,
                         const raylib::Texture2D &atlas,
-                        Image &pngImage)
+                        raylib::Image &pngImage)
     {
         // pull the atlas texture into a CPU image once, so the blit loop is cheap.
-        Image atlasImage = LoadImageFromTexture(atlas);
+        raylib::Image atlasImage = LoadImageFromTexture(atlas);
 
         // start from a blank canvas sized to the whole map in pixels.
         pngImage = GenImageColor(level.width * settings::TileSize,
@@ -61,9 +61,6 @@ namespace civsim::level::io
                           WHITE);
             }
         }
-
-        // free the temporary CPU image.
-        UnloadImage(atlasImage);
 
         return true;
     }

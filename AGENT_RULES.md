@@ -51,6 +51,17 @@ here — this is the standing contract.
   (plus `<...>` std headers).
   - **Only exception:** `src/level/cluster.cpp` keeps `#include "level/level.hpp"`,
     because `cluster.hpp` only forward-declares `Level`.
+- **raylib vs raylib-cpp:**
+  - Use **`raylib::` types** for anything we **store, pass, or own** (`raylib::Window`,
+    `raylib::Camera2D`, `raylib::Vector2`, `raylib::Texture2D`, `raylib::Image`, ...).
+  - Use **raw C calls** for **one-shot** work only — poking the framebuffer or querying
+    input/draw (`DrawTextureRec`, `ImageDraw`, `DrawText`, `IsKeyDown`, ...).
+  - **Never** feed a raw C handle (`Texture2D`, `Image`, ...) into a `raylib::` parameter:
+    raylib-cpp's implicit converting ctor silently builds an **owning temporary** that
+    `Unload()`s at the end of the call expression (this once freed the atlas mid-frame →
+    black screen). Own the resource as a `raylib::` object and pass it **by reference**.
+  - Qualify one-shot calls whose raylib-cpp wrapper collides by ADL once an argument is a
+    `raylib::` type (e.g. `raylib::ExportImage(...)` vs the C `ExportImage`).
 - **Move-only / don't restructure.** Type and move discipline stays as is.
 
 ## Don't do (unless explicitly asked)

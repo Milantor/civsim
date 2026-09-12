@@ -31,5 +31,5 @@ namespace civsim::level::io
      */
     bool SaveLevelAsPng(const Level &level,
                         const raylib::Texture2D &atlas,
-                        Image &pngImage);
+                        raylib::Image &pngImage);
 }

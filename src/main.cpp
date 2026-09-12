@@ -26,7 +26,7 @@ raylib::Texture2D BuildAtlas(std::vector<tile::TileInfo> &infos);
 unsigned int BuildTileVBO(const Level &level, const std::vector<tile::TileInfo> &infos);
 
 // draws the map VBO
-void DrawTileVBO(unsigned int vboId, int vertexCount, const Texture2D &atlasTexture);
+void DrawTileVBO(unsigned int vboId, int vertexCount, const raylib::Texture2D &atlasTexture);
 
 int main()
 {
@@ -87,17 +87,15 @@ int main()
         }
     }
 
-    Image pngImage = {0};
+    raylib::Image pngImage;
     if (io::SaveLevelAsPng(level,
                            atlasTexture,
                            pngImage))
     {
-        ExportImage(pngImage, pngFile.c_str());
-        // test
-        Image atlasImage = LoadImageFromTexture(atlasTexture);
-        ExportImage(atlasImage, (outDir / "atlas.png").c_str());
-        UnloadImage(atlasImage);
-        UnloadImage(pngImage);
+        raylib::ExportImage(pngImage, pngFile);
+        //i need it for eye reason
+        raylib::Image atlasImage = LoadImageFromTexture(atlasTexture);
+        raylib::ExportImage(atlasImage, (outDir / "atlas.png").string());
     }
 
     // shut down
@@ -144,7 +142,7 @@ unsigned int BuildTileVBO(const Level &level, const std::vector<tile::TileInfo> 
     return 0;
 }
 
-void DrawTileVBO(unsigned int vboId, int vertexCount, const Texture2D &atlasTexture)
+void DrawTileVBO(unsigned int vboId, int vertexCount, const raylib::Texture2D &atlasTexture)
 {
     // draw the map VBO
     // ...
